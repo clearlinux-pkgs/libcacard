@@ -6,7 +6,7 @@
 #
 Name     : libcacard
 Version  : 2.7.0
-Release  : 1
+Release  : 2
 URL      : https://www.spice-space.org/download/libcacard/libcacard-2.7.0.tar.xz
 Source0  : https://www.spice-space.org/download/libcacard/libcacard-2.7.0.tar.xz
 Source1  : https://www.spice-space.org/download/libcacard/libcacard-2.7.0.tar.xz.asc
