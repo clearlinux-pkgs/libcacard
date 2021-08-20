@@ -1,3 +1,1232 @@
+commit 7b07684ea6698d4885ff2062350ad8798a04de42
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Aug 11 10:57:29 2021 +0200
+
+    NEWS: prepare for 2.8.1
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ NEWS | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+commit 2f7a067ed64ce48095b3dc56bad3c45e17c4d34c
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Aug 12 18:01:39 2021 +0200
+
+    Makefile: Add missing files for tests and clean outstanding ones
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ Makefile.am | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+commit a3801ff3d73f0158e656453b7df958acdddbe03f
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Aug 12 16:29:53 2021 +0200
+
+    Package fuzzer inputs and db symlink for meson tests to pass
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ Makefile.am | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+commit 945c25c82bdba0737362caf39a31f58d857e206a
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Aug 12 15:03:46 2021 +0200
+
+    common: Fix build with glib < 2.68
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ src/common.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 21649747849c464cc8e67b832d1d5582e66eaee8
+Author: Frediano Ziglio <freddy77@gmail.com>
+Date:   Thu Aug 12 12:31:58 2021 +0100
+
+    Fix issue using g_memdup2
+    
+    Due to the way Autoconf works you cannot reuse PKG_CHECK_MODULES
+    for the same library so the compilation failed on some systems.
+    Check using just code and defines instead of using configuration
+    software.
+    Also avoids macros to avoid side effects.
+    
+    Signed-off-by: Frediano Ziglio <freddy77@gmail.com>
+
+ configure.ac         |  9 +--------
+ meson.build          | 12 +++---------
+ src/common.c         | 14 ++++++++++++++
+ src/common.h         |  7 +++----
+ src/vcard_emul_nss.c |  1 +
+ 5 files changed, 22 insertions(+), 21 deletions(-)
+
+commit 9c40d3b5a65e5d2f5244085061e3c96a6142ecea
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Aug 12 12:18:50 2021 +0200
+
+    ci: Add Ubuntu 16.04 for old glib
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ .gitlab-ci.yml | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+commit a37e7bb2b00131b87124c1895a6525ea6eb52516
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Aug 3 16:30:46 2021 +0200
+
+    Use g_memdup2 if available and fallback if not
+
+ configure.ac         |  9 ++++++++-
+ meson.build          | 12 +++++++++---
+ src/cac.c            |  2 +-
+ src/card_7816.c      |  2 +-
+ src/common.h         |  6 ++++++
+ src/simpletlv.c      |  4 ++--
+ src/vcard.c          |  5 +++--
+ src/vcard_emul_nss.c |  5 +++--
+ src/vscclient.c      |  2 +-
+ 9 files changed, 34 insertions(+), 13 deletions(-)
+
+commit cf6121deb47e437aa566cfeb29a03da93c432394
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Jan 4 18:15:53 2021 +0100
+
+    meson: avoid unknown variable softhsm warning when missing test dependencies
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <freddy77@gmail.com>
+
+ tests/meson.build | 44 ++++++++++++++++++++++----------------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
+
+commit c75dc5f3036bf51120367b4d5fd6b442989b1dc1
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Jan 4 10:54:39 2021 +0100
+
+    Supress memory leak from NSS system policy
+    
+    It is suppressed also by using NSS_IGNORE_SYSTEM_POLICY=1 but we want to run
+    as closely as possible to existing systems so we rather supress it. The leak
+    did not have very useful trace, but from code review it was certainly related
+    to the system policy in NSS.
+    
+    ==6995==ERROR: LeakSanitizer: detected memory leaks
+    Direct leak of 4097 byte(s) in 1 object(s) allocated from:
+        #0 0x7f973a3c33cf in __interceptor_malloc (/lib64/libasan.so.6+0xab3cf)
+        #1 0x7f973a35b4b8  (/lib64/libasan.so.6+0x434b8)
+        #2 0x7f9735bc47dd  (<unknown module>)
+        #3 0x7f9735bc9338  (<unknown module>)
+        #4 0x7f9735bcd149  (<unknown module>)
+        #5 0x7f973a03316a  (/lib64/libnss3.so+0x4616a)
+        #6 0x7f973a03ffbc in SECMOD_LoadModule (/lib64/libnss3.so+0x52fbc)
+        #7 0x7f973a0400f7 in SECMOD_LoadModule (/lib64/libnss3.so+0x530f7)
+        #8 0x7f973a009820  (/lib64/libnss3.so+0x1c820)
+        #9 0x7f973a009d9b in NSS_InitContext (/lib64/libnss3.so+0x1cd9b)
+        #10 0x7f973a2ffc3f in vcard_emul_init (/builds/jjelen/libcacard/.libs/libcacard.so.0+0x21c3f)
+        #11 0x40eed3 in libcacard_init (/builds/jjelen/libcacard/tests/.libs/lt-libcacard+0x40eed3)
+        #12 0x41b2c1 in main (/builds/jjelen/libcacard/tests/.libs/lt-libcacard+0x41b2c1)
+        #13 0x7f9739d9d1a1 in __libc_start_main (/lib64/libc.so.6+0x281a1)
+        #14 0x40258d in _start (/builds/jjelen/libcacard/tests/.libs/lt-libcacard+0x40258d)
+    SUMMARY: AddressSanitizer: 4097 byte(s) leaked in 1 allocation(s).
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ suppr.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 4e1e4aebf384d2afcfb958c23f87db26de1495c1
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Fri Oct 30 15:15:19 2020 +0100
+
+    tests: Implement decipher test to execute missing use case
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ tests/common.c          |  81 ++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/common.h          |   2 ++
+ tests/db.crypt          | Bin 0 -> 256 bytes
+ tests/hwtests.c         |  28 +++++++++++++++++
+ tests/libcacard.c       |  18 +++++++++++
+ tests/setup-softhsm2.sh |   5 +++
+ 6 files changed, 134 insertions(+)
+
+commit 371b8841032a5c6db2c97c1aec9e3428a063209e
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Fri Oct 30 18:01:01 2020 +0100
+
+    tests: Temporarily generate only one key
+    
+    This helps making sure we use for deciphering the same key that
+    was used for encrypting the plaintext as we can not affect the
+    ordering of the keys coming from softhsm to libcacard in any
+    simple way.
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ tests/setup-softhsm2.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit aca849bee8b64d3c83a7bcc57b12b1ced76ae5ac
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Fri Oct 30 15:12:59 2020 +0100
+
+    tests: Fix comments
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ tests/common.c  | 2 +-
+ tests/hwtests.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit ae68776db9a6097cd6307befc74d4eec00cc55da
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Fri Oct 30 15:12:30 2020 +0100
+
+    tests: Fix ofset calculation while reading buffers
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ tests/common.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+commit 323defeef280bf2de63d6b5dcdfc13ab7ed9ff4b
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Oct 29 16:23:34 2020 +0100
+
+    vcard_emul_nss: Fix RAW deciphering emulation using PKCS1 method
+    
+    This reverts the commit c3838328 which technically made this
+    code dead code.
+    
+    I got a clarifiction from Bob, that the code was wrong, including
+    the assert, which caused a lot of confusion in the past.
+    
+    Fixes #25
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vcard_emul_nss.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+commit 8676f404a2284a7638717e59da0d1921e3e688b8
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Oct 7 21:09:52 2020 +0200
+
+    Run fuzzers as part of CI at least with example inputs
+    
+    This helps to catch errors earlier than in oss-fuzz and avoids
+    0% code coverages of fuzzers when generated by meson.
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ fuzz/corpora/fuzz_options/test   |   1 +
+ fuzz/corpora/fuzz_simpletlv/test | Bin 0 -> 1022 bytes
+ fuzz/corpora/fuzz_xfer/test      | Bin 0 -> 443 bytes
+ fuzz/db                          |   1 +
+ fuzz/fuzz_xfer.c                 |  23 +++++++----------------
+ fuzz/meson.build                 |  10 +++++++++-
+ 6 files changed, 18 insertions(+), 17 deletions(-)
+
+commit 98b626ec8cbe1d12b302a5e84f7b9eabeff0960a
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Oct 7 15:07:24 2020 +0200
+
+    Readme: Update link to the coverage report
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 15e621d8d520fe508efdbdd054d2363082137647
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Oct 7 14:29:17 2020 +0200
+
+    test: Run hwtests with token not supporting raw RSA signatures
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ tests/meson.build       | 10 ++++++++++
+ tests/setup-softhsm2.sh |  9 +++++++++
+ 2 files changed, 19 insertions(+)
+
+commit b2aa029c86ca155b19e6b799306335d6b8329d70
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Oct 7 13:50:58 2020 +0200
+
+    Improve non-deterministic test to have lower chance to fail
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/gp.c       |  5 +++--
+ tests/common.c | 11 +++++------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+commit b298538fecaa48dd15af295cf962c28ed2ef21f7
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Fri Oct 30 17:52:31 2020 +0100
+
+    gitlab-ci: Try to report results in junit format
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ .gitlab-ci.yml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 740f95857eaffbc3dfa8e0762f0836f16a4b4efc
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Fri Oct 30 15:43:58 2020 +0100
+
+    gitlab-ci: Upload artifacts always (not on success, which is default)
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ .gitlab-ci.yml | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+commit 2038639a361fb8fcc32087f9c631b77e37b23a51
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Oct 7 15:06:01 2020 +0200
+
+    gitlab-ci: Let meson generate coverage reports
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ .gitlab-ci.yml | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+commit 3c29cd10b211e81e79f38f4c0a9d42070a382789
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Oct 6 17:36:28 2020 +0200
+
+    test: Add 32b paths for softhsm
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ tests/setup-softhsm2.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit e47664f097f5328d01a6c36d3e11577d6445b3b4
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Sep 22 18:50:16 2020 +0200
+
+    Document release process
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ docs/how_to_release.md | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+commit 92260db57406b081712aaf2bc165e9790433dd64
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Sep 15 14:43:53 2020 +0200
+
+    Package also meson build files using autotools
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ Makefile.am | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+commit 92a1a7cdb05a3f47597de4308cf220814543e38c
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Sep 15 13:42:51 2020 +0200
+
+    Install missing dependencies in CI
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ .gitlab-ci.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 00a04b6a8d45c5e72a3ac3208f454ff2d3efe47f
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Sep 15 13:01:02 2020 +0200
+
+    Do not reference .travis-ci.yml anymore for meson build
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ build-aux/meson-dist | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit ca3ec20ec49f664116e92078e19f4e8de0347556
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Sep 15 12:49:41 2020 +0200
+
+    Remove unused travis.yml
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ .travis.yml | 25 -------------------------
+ 1 file changed, 25 deletions(-)
+
+commit 887c1c9a02eea6d7e894406e64faaf1fbb803cab
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Sep 15 12:49:22 2020 +0200
+
+    Test also dist target through both meson and autotools
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ .gitlab-ci.yml | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+commit 5123a3d2da5ff525f818cc76fb4058170578d602
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Sep 15 12:49:01 2020 +0200
+
+    Add correct files to autotools dist target
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ Makefile.am | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit d31caac6af7c8c47af18cc2501e3d98e5c09d2b1
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Sep 3 16:14:27 2020 +0200
+
+    NEWS: Prepare for v2.8.0 release
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ NEWS | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+commit 8803567fb3cec7f5142710b4992b8f6b97fc03c7
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Sep 3 15:52:41 2020 +0200
+
+    Add a link to QEMU documentaiton of CCID device
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ README.md | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+commit 1328c2b800b3cd64d867ba4cc6f62e1c8748900d
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Aug 11 08:47:01 2020 +0000
+
+    Add fuzzing status badge from oss-fuzz
+
+ README.md | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit d38b8679361a235c0d7b3bf8a925129e1e435965
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Jun 25 10:30:43 2020 +0200
+
+    vreader: Do not log critical errors on unknown instruction
+    
+    Fixes !9
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vreader.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 2333c79b65b4e439fb4b0c6d79e2bdd036c5bfcd
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Jun 25 10:25:25 2020 +0200
+
+    fuzz: Fix formatting
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ fuzz/fuzz_options.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 59198e5d8fda5f6c51e3753817f72a10df89057e
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Jun 25 10:25:13 2020 +0200
+
+    fuzz: Fix error message
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ fuzz/fuzz_options.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit e50858ad028e9496084ef0884791b3fcaab02f9c
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Apr 27 10:55:52 2020 +0200
+
+    gitlab-ci: Add CentOS 7 build and test targets
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ .gitlab-ci.yml | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+commit 355279d8e33a03119341fb4d7ffc6e7c0dce6c1d
+Author: Frediano Ziglio <freddy77@gmail.com>
+Date:   Mon Apr 27 08:33:02 2020 +0100
+
+    ci: Avoid apt-get to ask questions
+    
+    With last Ubuntu update apt-get will ask interactively some
+    question causing the CI to hang and fail due to timeout.
+    Avoid this interaction.
+    
+    Signed-off-by: Frediano Ziglio <freddy77@gmail.com>
+    Acked-by: Jakub Jelen <jjelen@redhat.com>
+
+ .gitlab-ci.yml | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 041369419ff3818ffbeb6451aeefd1a69e7db8dc
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Apr 21 11:55:29 2020 +0200
+
+    vcard_emul_nss: Fix parameter name in usage documentation
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vcard_emul_nss.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 9690b9445d74f2809cd7dcbd10c09b8d2867929a
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Apr 20 19:10:58 2020 +0200
+
+    fuzz_options: Clean up allocated memory
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ fuzz/fuzz_options.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 42 insertions(+), 2 deletions(-)
+
+commit e392f893c82e0112b5008eab39339bc6e9aaf77a
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Apr 20 17:05:29 2020 +0200
+
+    Fuzzer for options parser
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ fuzz/fuzz_options.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ fuzz/meson.build    |  1 +
+ 2 files changed, 41 insertions(+)
+
+commit a3b0f33697682782e6e99dfb71d4d11c93da7856
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Apr 20 19:09:28 2020 +0200
+
+    vcard_emul_nss: Avoid redefinition of already set options
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vcard_emul_nss.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+commit e58b911d0983d6a6b196df97b517a82df866e9d5
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Apr 20 18:49:17 2020 +0200
+
+    vcard_emul_nss: Clean up memory
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vcard_emul_nss.c | 38 +++++++++++++++++++++++++++-----------
+ 1 file changed, 27 insertions(+), 11 deletions(-)
+
+commit 9d352ecdaf8ccf446c7e1c9706cb7329b5647f9d
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Apr 20 18:43:01 2020 +0200
+
+    vcard_emul_nss: Do not use const char for something changable
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vcard_emul_nss.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit aebeee08e245d630c0d5e4e85a8678702aa96347
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Apr 20 18:16:35 2020 +0200
+
+    vcard_emul_nss: Avoid null deref when parsing options
+    
+    Error from fuzzer:
+    
+    ==7==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x0000004e1a32 bp 0x7ffdf742d050 sp 0x7ffdf742cfa0 T0)
+    ==7==The signal is caused by a READ memory access.
+    ==7==Hint: address points to the zero page.
+    SCARINESS: 10 (null-deref)
+        #0 0x4e1a32 in vcard_emul_options /work/meson/../../src/libcacard/src/vcard_emul_nss.c:1282:13
+        #1 0x4cb79e in LLVMFuzzerTestOneInput /work/meson/../../src/libcacard/fuzz/fuzz_options.c:54:15
+    [...]
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vcard_emul_nss.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 0424cfbe6562c49154e2feef4ad51ca8807c8a42
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Apr 20 16:12:54 2020 +0200
+
+    Fuzz also simpletlv parser
+    
+    The parser is not covered as it is used for parsing output of real
+    cards (which are not available in tests and emulation).
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ fuzz/fuzz_simpletlv.c | 27 +++++++++++++++++++++++++++
+ fuzz/meson.build      |  2 ++
+ 2 files changed, 29 insertions(+)
+
+commit 806335366f5c332efb9d457078199c0e932a72dc
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Apr 16 19:52:55 2020 +0200
+
+    tests: New tests of initialization
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ Makefile.am        |  8 ++++++
+ tests/initialize.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/meson.build  | 13 +++++++++
+ 3 files changed, 101 insertions(+)
+
+commit 57deaec6d70711c1cb87896991ab1fe9ff1879b3
+Author: Jakub Jelen <jakuje@gmail.com>
+Date:   Sun Dec 15 21:33:24 2019 +0100
+
+    Add first simple fuzzer
+    
+    Per [1], we are good to go to integrate in oss-fuzz. This adds
+    aa simple fuzzer and some housekeeping/preparatory work around
+    build system to be able to build fuzzers for oss-fuzz.
+    
+    The fuzzers can be built only with new meson build system as
+    trying to make it working with autotools was quite a pain.
+    
+    The oss-fuzz is already running on my fork temporarily, before
+    this will be merged as in [2].
+    
+    [1] https://github.com/google/oss-fuzz/pull/3019
+    [2] https://github.com/google/oss-fuzz/pull/3466
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ fuzz/fuzz_xfer.c | 196 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fuzz/fuzzer.c    |  38 +++++++++++
+ fuzz/fuzzer.h    |  13 ++++
+ fuzz/meson.build |  22 +++++++
+ meson.build      |   4 +-
+ 5 files changed, 272 insertions(+), 1 deletion(-)
+
+commit 358e2d8bb045d80803190534ec1986c4242d10fc
+Author: Frediano Ziglio <freddy77@gmail.com>
+Date:   Fri Apr 17 10:00:25 2020 +0100
+
+    Avoids some code duplication
+    
+    Call NSS_InitContext and handle its result once.
+    
+    Signed-off-by: Frediano Ziglio <freddy77@gmail.com>
+    Acked-by: Jakub Jelen <jjelen@redhat.com>
+
+ src/vcard_emul_nss.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+commit 936519e55c24314a28faed6caf34fbac120bb89a
+Author: Frediano Ziglio <freddy77@gmail.com>
+Date:   Fri Apr 17 09:46:37 2020 +0100
+
+    Cache g_get_system_config_dirs results
+    
+    Do not call the function 3 times in a row.
+    
+    Signed-off-by: Frediano Ziglio <freddy77@gmail.com>
+    Acked-by: Jakub Jelen <jjelen@redhat.com>
+
+ src/vcard_emul_nss.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+commit 30bdd7c9e31bb3a79ba6ccd876e172f2c72c1352
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Mar 10 10:51:45 2020 +0100
+
+    vcard_emul_nss: Avoid memory leaks by properly freeing all references
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vcard_emul_nss.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 1b03307d55577d5cb8891a223de408d9d7c42ba8
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Mar 9 16:13:37 2020 +0100
+
+    Generate new NSS DB for tests
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ tests/db/cert8.db   | Bin 65536 -> 0 bytes
+ tests/db/cert9.db   | Bin 0 -> 36864 bytes
+ tests/db/key3.db    | Bin 16384 -> 0 bytes
+ tests/db/key4.db    | Bin 0 -> 61440 bytes
+ tests/db/pkcs11.txt |   5 +++++
+ tests/db/secmod.db  | Bin 16384 -> 0 bytes
+ 6 files changed, 5 insertions(+)
+
+commit 42475d4ca9ae8b75b349b9b522837de50e8a487b
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Fri Mar 6 14:52:07 2020 +0100
+
+    Use the new finalize API in tools and tests and refactor the order of the calls in cleanup
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vscclient.c   | 2 ++
+ tests/hwtests.c   | 7 ++++++-
+ tests/libcacard.c | 9 +++++++--
+ 3 files changed, 15 insertions(+), 3 deletions(-)
+
+commit a9fb4177973ad99d3ec030d30a4388c26149a759
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Apr 16 18:56:39 2020 +0200
+
+    vcard_emul_nss: Use NSS_{Init,Shutdown}Context() functions to avoid messing with not owned contexts
+    
+    As recommended by the NSS wiki:
+    
+    https://wiki.mozilla.org/NSS_Library_Init
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vcard_emul_nss.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+commit 177d55dfcc373b3c466fba26b3930c7a3ec38cd1
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Fri Mar 6 14:40:03 2020 +0100
+
+    Introduce new API for cleanup
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ docs/libcacard.txt   |  5 +++++
+ src/libcacard.map    |  1 +
+ src/vcard_emul.h     |  1 +
+ src/vcard_emul_nss.c | 14 ++++++++++++++
+ 4 files changed, 21 insertions(+)
+
+commit fd2e0949a2fbb94f761218c2268761a9c7386501
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Mar 5 16:13:30 2020 +0100
+
+    Do not attempt to run HW tests without all dependencies
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ tests/meson.build | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+commit f920d8c505e76ec1a66bc447e189eefb2ffd5b0e
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Mar 5 15:26:44 2020 +0100
+
+    meson: Allow building static libraries
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ meson.build | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+commit 954d4ca5b7840fe324ce7af1c85342edf70ba828
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Mar 5 14:05:37 2020 +0100
+
+    meson: Add an option do skip tests
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ meson.build       | 4 +++-
+ meson_options.txt | 5 +++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+commit 6c82a8e4bcbfafc929ed3a946dadca239443e519
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Mar 4 16:19:54 2020 +0100
+
+    meson: The libcacard test does not require softhsm
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ tests/meson.build | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit e63bc9f3d63a74a07cd6b56e86a410ba0ab33249
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Mar 4 11:03:20 2020 +0100
+
+    vcard_emul_nss: Log message if the NSS_Init fails (with db dir used)
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vcard_emul_nss.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+commit 243d116407f9a3ce134dfb02fa6bc5c4064fc970
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Mar 3 17:36:28 2020 +0100
+
+    Fix link to contribution documentation
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit af251faaea392d6786dee32bfa82bf03a44b7500
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Mar 3 13:22:54 2020 +0100
+
+    gitlab-ci: Run also tests from meson
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ .gitlab-ci.yml | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit aa49fabb846bd00d5099338714e04fac1b002400
+Author: Frediano Ziglio <fziglio@redhat.com>
+Date:   Fri Jan 31 11:01:38 2020 +0000
+
+    ci: Rename "meson" job to "Fedora meson"
+    
+    All other job names start with the distribution name.
+    
+    Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+    Acked-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+ .gitlab-ci.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit a56873faf3703429823c3310c80064aa62fab456
+Author: Frediano Ziglio <fziglio@redhat.com>
+Date:   Wed Jan 29 20:59:15 2020 +0000
+
+    build: Clean unwanted files packaging the distribution
+    
+    Remove CI files and other not necessary files.
+    
+    Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+    Acked-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+ build-aux/meson-dist | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+commit 9fd0f50a86649b017fb23bf7c57dfc4e0e35972d
+Author: Frediano Ziglio <fziglio@redhat.com>
+Date:   Wed Jan 29 20:37:37 2020 +0000
+
+    build: Generate ChangeLog like autoconf
+    
+    Instead of generating THANKS, generate ChangeLog like autoconf does.
+    
+    Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+    Acked-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+ build-aux/meson-dist | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+commit f0bf1b44610f0733d2e2fde5ffce414ec71fa303
+Author: Marc-André Lureau <marcandre.lureau@redhat.com>
+Date:   Wed Jan 15 16:16:38 2020 +0400
+
+    build-sys: add meson
+    
+    autotools is left for now, for a small transition period, and to cover
+    win32 when either p11 backend is added or nss is packaged again in mingw.
+    
+    Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ .gitlab-ci.yml       |  8 ++++-
+ Makefile.am          | 12 +++----
+ build-aux/meson-dist | 23 +++++++++++++
+ meson.build          | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ meson_options.txt    |  4 +++
+ src/common.c         |  2 --
+ src/libcacard.map    | 82 +++++++++++++++++++++++++++++++++++++++++++++
+ src/libcacard.syms   | 77 ------------------------------------------
+ src/simpletlv.c      |  2 --
+ tests/meson.build    | 52 +++++++++++++++++++++++++++++
+ 10 files changed, 268 insertions(+), 88 deletions(-)
+
+commit 9f19c8f1520ba0e12fa949a3136a69e208d3c08a
+Author: Marc-André Lureau <marcandre.lureau@redhat.com>
+Date:   Wed Jan 29 10:39:11 2020 +0100
+
+    Fix -Wunused-parameter warnings
+    
+    Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ tests/hwtests.c   | 2 +-
+ tests/libcacard.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit 0fc45266550f5b6bd0da8a8e40245d7ff09618ee
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Jan 23 17:30:20 2020 +0100
+
+    setup-softhsm2: Try to find library on Ubuntu
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ tests/setup-softhsm2.sh | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+commit 48c4dea84674a2da2271a0bbb29cda7696b151d6
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Jan 23 16:20:08 2020 +0100
+
+    Add Ubuntu target to catch different issues
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ .gitlab-ci.yml | 39 +++++++++++++++++++++++++++++++--------
+ 1 file changed, 31 insertions(+), 8 deletions(-)
+
+commit 383dfad4ea750ca0d6317a04bf168ddf7b593dd7
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Thu Jan 23 16:30:11 2020 +0100
+
+    Properly add glib dependency to unbreak vsclient and tests build on Ubuntu
+    
+    Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ Makefile.am  | 10 +++++++---
+ configure.ac |  3 ++-
+ 2 files changed, 9 insertions(+), 4 deletions(-)
+
+commit 83c87e0a2e064442d88949ff2a3842cc626748b5
+Author: Marc-André Lureau <marcandre.lureau@redhat.com>
+Date:   Thu Jan 23 13:53:25 2020 +0400
+
+    build-sys: remove unused LIBCACARD_COMPILATION
+    
+    Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit 8c65e93093a7218a7cda8a5a5a1c385cf298f579
+Author: Marc-André Lureau <marcandre.lureau@redhat.com>
+Date:   Wed Jan 22 15:40:23 2020 +0400
+
+    libcacard.pc.in: improve description
+    
+    Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ libcacard.pc.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit b0ab359d3ec577960fa9874893e1be52e4eff29b
+Author: Marc-André Lureau <marcandre.lureau@redhat.com>
+Date:   Wed Jan 22 15:40:11 2020 +0400
+
+    build-sys: improve --disable-pcsc help
+    
+    Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 2e8eef9d3f8e2faf12d20a9adf0f85d53e511de5
+Author: Marc-André Lureau <marcandre.lureau@redhat.com>
+Date:   Wed Jan 22 15:20:48 2020 +0400
+
+    tests: fix shebang
+    
+    Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ tests/setup-softhsm2.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 6e456bf6ad9731623786b4fb834b062481b1fd97
+Author: Marc-André Lureau <marcandre.lureau@redhat.com>
+Date:   Wed Jan 15 14:37:17 2020 +0400
+
+    build-sys: bump glib dependency to 2.32
+    
+    Since version 2.32, gthread is an empty shell, and g_thread_init() is
+    no longer required.
+    
+    GLib 2.32 was released on 2012-03-24, and is available in all distros
+    we care about.
+    
+    Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ Makefile.am           |   5 +-
+ configure.ac          |   3 +-
+ src/cac-aca.c         |   3 +-
+ src/cac-aca.h         |   1 -
+ src/cac.c             |   2 +-
+ src/capcsc.c          |   5 +-
+ src/card_7816.c       |   2 +-
+ src/event.c           |   6 +--
+ src/glib-compat.h     | 138 --------------------------------------------------
+ src/gp.c              |   2 +-
+ src/msft.c            |   2 +-
+ src/vcard.c           |   2 +-
+ src/vcard_emul_nss.c  |   4 +-
+ src/vcard_emul_type.c |   3 +-
+ src/vreader.c         |   6 +--
+ src/vscclient.c       |  15 ++----
+ 16 files changed, 28 insertions(+), 171 deletions(-)
+
+commit d276f5a05a58620b8952063fa0147165a1e8d8e8
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Dec 2 17:44:32 2019 +0100
+
+    Add CII Best Practices Badge
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ README.md | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+commit 2f20d62e7ad6890d7d34a8443e7051d29e91a3f6
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Dec 2 17:31:33 2019 +0100
+
+    README: Add high-level description of the libcacard project
+    
+    and links to other documents inside
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ README.md | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 73 insertions(+), 1 deletion(-)
+
+commit 4efc0459287a8df407893682d72d3a0e770cefdb
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Dec 2 17:31:02 2019 +0100
+
+    Clarify contributor guidelines
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ CONTRIBUTING.md | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
+
+commit 2126c18d649ab37ddc73bb556d7c671446da0ece
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Dec 2 17:30:23 2019 +0100
+
+    Fix typo in README
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 6566b169953add012fe773b882cca4b6076131a9
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Dec 2 14:59:59 2019 +0100
+
+    fix typo in comment
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ src/vcard_emul_nss.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 2bae8772377597718852b37f6b84db005c01ec67
+Author: Frediano Ziglio <fziglio@redhat.com>
+Date:   Thu Aug 23 12:54:20 2018 +0100
+
+    simpletlv: Reuse g_memdup
+    
+    The effect of g_new+memcpy is the same of a single g_memdup
+    
+    Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+    Acked-by: Jakub Jelen <jjelen@redhat.com>
+
+ src/simpletlv.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+commit 6eb75750d0167810d88f2551ac0c56bad6a3bbdb
+Author: Frediano Ziglio <fziglio@redhat.com>
+Date:   Fri Nov 15 16:47:39 2019 +0000
+
+    ci: Ignore OpenSSL memory leak
+    
+    OPENSSL_init_crypto allocates some memory that will only freed
+    by the operating system when the process will terminate and
+    are reported as leak.
+    Ignore these leaks to make Gitlab "asan" job so succeed.
+    
+    Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+    Acked-by: Jakub Jelen <jjelen@redhat.com>
+
+ .gitlab-ci.yml | 2 +-
+ suppr.txt      | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+commit e3ef3dd597b54e1f4f42f0670f2f6bf6af745fd3
+Author: Frediano Ziglio <fziglio@redhat.com>
+Date:   Fri Nov 15 15:53:15 2019 +0000
+
+    ci: Try to get readable errors
+    
+    Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+    Acked-by: Jakub Jelen <jjelen@redhat.com>
+
+ .gitlab-ci.yml | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+commit 21a3f9ecb2fa5d859afc066a8837a029f6064606
+Author: Frediano Ziglio <fziglio@redhat.com>
+Date:   Fri Nov 15 16:33:59 2019 +0000
+
+    vcard_emul_nss: Remove leak in vcard_emul_rsa_op
+    
+    The private key returned by PK11_FindPrivateKeyFromCert should
+    be freed by SECKEY_DestroyPrivateKey.
+    
+    Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+    Acked-by: Jakub Jelen <jjelen@redhat.com>
+
+ src/vcard_emul_nss.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+commit af691f98f6209db91348c1e3a553ed58da3ee091
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Fri Nov 15 12:00:27 2019 +0100
+
+    simpletlv: Handle zero-length values in recursive tags
+    
+    Fixes #4
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/simpletlv.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 43c05401c48d98572c53c92b81237f607f85386d
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Fri Nov 15 13:50:26 2019 +0100
+
+    vscclient: Avoid memory leaks
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/vscclient.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+commit ebffe4d6a60c74dbf2c0c3227401ca1a62bd4a67
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Wed Sep 11 09:45:34 2019 +0200
+
+    cac-aca: Avoid type casting causing test failures on s390
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+    Acked-by: Frediano Ziglio <fziglio@redhat.com>
+
+ src/cac-aca.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 06587ef683373690f61540935b4516b4f23238ea
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Tue Aug 27 12:38:45 2019 +0200
+
+    tests: Reproducer for pkcs11 modules invalidating object handles on logout
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ tests/hwtests.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+commit 2c10ae315375730020108cbcae0c282d0d6eff5f
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Mon Aug 26 17:42:06 2019 +0200
+
+    vcard_emul_nss: Drop the key caching to simplify error handling
+    
+    It could happen with PKCS#11 modules that (correctly) invalidate object
+    handles after logout (which was introduced in 0d3a683a), that the handles
+    are not valid when we try to use the objects again.
+    
+    This is trying to address this use case, which I noticed was breaking
+    CI with SoftHSM PKCS#11 modules.
+    
+    Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+ src/vcard_emul_nss.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
+
 commit e4d4c13f25fd2a13ba07c71069be5e5fa65fd603
 Author: Jakub Jelen <jjelen@redhat.com>
 Date:   Mon Jul 8 13:22:45 2019 +0200

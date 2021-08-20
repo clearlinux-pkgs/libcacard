@@ -1,3 +1,21 @@
+v2.8.1
+======
+ - Improve CI and build scripts
+ - Execute tests also with token not supporting raw RSA
+ - Run fuzzers in CI
+ - Unbreak RAW deciphering emulation using RSA-PKCS1 method
+ - Use g_memdup2 to avoid deprecation warnings with new glib2
+
+v2.8.0
+======
+ - Improve project documentation
+ - Bump minimal glib version to 2.32 and remove old compatibility functions
+ - Introduce meson build system in addition to existing autotools
+ - Create and run fuzzer drivers to improve stability
+ - Introduce a new API vcard_emul_finalize() to clean up allocated resources
+ - Remove key caching to avoid issues with some PKCS #11 modules
+ - Prevent logging critical errors on unknown instruction
+
 v2.7.0
 ======
 
